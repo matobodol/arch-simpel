@@ -7,9 +7,12 @@
 
 ```bash
 git clone https://github.com/matobodol/arch-simpel
-```
+
 ```bash
 cd arch-simpel
-```
+
+```bash
+chmod +x *.sh
+
 ```bash
 ./install.sh
