@@ -13,4 +13,3 @@ cd arch-simpel
 ```
 ```bash
 ./install.sh
-``
