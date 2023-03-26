@@ -3,7 +3,7 @@
 
 install_base() {
 	pacman -Sy --noconfirm archlinux-keyring
-	pacstrap /mnt base base-devel linux-lts linux-firmware nano libnewt
+	pacstrap /mnt base base-devel linux-lts linux-firmware-lts nano libnewt
 	
 	# memperbaiki gpg key
 	if ! [[ $? == 0 ]]; then 
@@ -13,7 +13,7 @@ install_base() {
 		pacman-key --init
 		pacman-key --populate archlinux
 		
-		pacstrap /mnt base base-devel linux-lts linux-firmware nano libnewt
+		pacstrap /mnt base base-devel linux-lts linux-firmware-lts nano libnewt
 		
 		! [[ $? == 0 ]] && exit
 	fi
@@ -67,6 +67,7 @@ set_grub() {
 
 set_hostname() {
 	echo "$hostName" > /etc/hostname
+	
 	cat >> /etc/hosts <<EOF
 127.0.0.1	localhost 
 ::1		localhost
