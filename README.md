@@ -6,6 +6,10 @@
 >**Install**
 
 ```bash
+pacman -Sy && pacman -S git
+```
+
+```bash
 git clone https://github.com/matobodol/arch-simpel.git
 ```
 
