@@ -518,9 +518,6 @@ creat_root() {
 		else
 			endSize='100%'
 		fi
-			
-		msg="free size: $freeSize Root: $endSize Path: ${selectedDrive}$noRoot!"
-		whiptail --title "BUAT PARTISI SISA" --msgbox "$msg" 7 75 3>&1 1>&2 2>&3
 		
 		parted -s $selectedDrive mkpart primary ${START}$a $endSize
 		START=$(( ( sizeRoot * x ) + START ))
