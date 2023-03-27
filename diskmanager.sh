@@ -1,5 +1,5 @@
 #! /bin/env bash
-#DISK MANAGER
+# DISK MANAGER
 
 reset_info_disk(){
 	unset {iswap,iroot,ihome,isisa}
@@ -59,7 +59,6 @@ input_disklabel_type() {
 		20 95 0 MBR "(ms-dos)" GPT "(efi)" 3>&1 1>&2 2>&3
 	)
 
-	reset_info_disk
 	case $diskLabelType in
 		MBR)
 			diskLabelType='msdos'
@@ -531,7 +530,7 @@ creat_home() {
 	if [[ $sizeHome -gt 0 ]]; then
 	
 		if [[ $sizeRoot -lt $((storageSize - sizeSwap - sizeRoot)) ]]; then
-			endSize=$(echo $(( ( sizeRoot * x ) + START ))$a)
+			endSize=$(echo $(( ( sizeHome * x ) + START ))$a)
 		else
 			endSize='100%'
 		fi
