@@ -1,165 +1,157 @@
 #! /bin/env bash
-# CONFIGURE
+# INPUT DATA
 
-install_base() {
-	pacman -Sy --noconfirm archlinux-keyring
-	pacstrap /mnt base base-devel linux-lts linux-firmware-lts nano libnewt
-	
-	# memperbaiki gpg key
-	if ! [[ $? == 0 ]]; then 
-		echo 'memperbaiki gpg key...'
-		killall gpg-agent
-		rm -rf /etc/pacman.d/gnupg
-		pacman-key --init
-		pacman-key --populate archlinux
+input_hostname() {
+	while true; do
+		msg="Nama host/komputer?"
+		hostName=$(whiptail --title "HOSTNAME"	--inputbox "$msg" --nocancel 7 70 3>&1 1>&2 2>&3)
 		
-		pacstrap /mnt base base-devel linux-lts linux-firmware-lts nano libnewt
+		if [[ $? == 0 ]]; then 
+			hostName=$(echo $hostName | tr '[:upper:]' '[:lower:]')               #convert huruf besar -> kecil
+			printf -v hostName '%s' $hostName; hostName=$(echo "$hostName")       #hapus semua spasi atau ruang kosong
+			[[ -n $hostName ]] && break
+		fi
+	done
+}
+
+input_root_password() {
+	while :; do
+		title="PASSWORD ROOT"
+		msg="Buat password root."
+		passRoot=$(whiptail --title "$title" --passwordbox "$msg" --nocancel 7 70 3>&1 1>&2 2>&3)		#passwordbox
 		
-		! [[ $? == 0 ]] && exit
-	fi
-}
-
-set_fstab() {
-	genfstab -U /mnt >> /mnt/etc/fstab
-}
-
-set_chroot() {
-	isetup="/mnt/setup.sh"
-	cp setup.sh /mnt
-	
-	sed -i "3ihostName='$hostName'" $isetup
-	sed -i "4ipassRoot='$passRoot'" $isetup
-	sed -i "5iuserName='$userName'" $isetup
-	sed -i "6ipassUser='$passUser'" $isetup
-	sed -i "7itimeZone='$timeZone'" $isetup
-	sed -i "8iaddtionalPackages='$(echo -e $addtionalPackages)'" $isetup
-	sed -i "9ikeyMap='$keyMap'" $isetup
-	sed -i "10iselectedDrive='$selectedDrive'" $isetup
-	sed -i "11ipathToInstallGrub='$pathToInstallGrub'" $isetup
-	sed -i "12iselectedRoot='$selectedRoot'" $isetup
-	
-	arch-chroot /mnt ./setup.sh chroot
-}
-
-error_message() {
-	if [[ -f /mnt/setup.sh ]];then
-		msg='ERROR: Tidak dapat melakukan chroot ke system.'
-		msg+='\nKesalah bisa terjadi karena proses install "base" terganggu.'
-		msg+='\nPastikan koneksi internet tetap stabil.'
-		echo "$msg"
-	else
-		unmount_filesystems
-		msg='Installation is complete.'
-		echo "$msg"
-  fi
-}
-
-set_grub() {
-	if [[ $grubyt -eq 0 ]]; then
-		grub-install --target=i386-pc $pathToInstallGrub
+		msg="Ulangi masukan password root"
+		passRoot1=$(whiptail --title "$title" --passwordbox "$msg" --nocancel 7 70 3>&1 1>&2 2>&3)		#passwordbox
+		
+		if [[ -z $passRoot ]] || [[ -z $passRoot1 ]]; then
+			msg="Password tidak boleh kosong!"
+			whiptail --title "$title" --msgbox "$msg" 7 70
+		
+		elif [[ $passRoot == $passRoot1 ]]; then
+			break;
+		
 		else
-		grub-install --target=i386-pc $selectedDrive
-	fi
+			msg="Password tidak sama!"
+			whiptail --title "$title" --msgbox "$msg" 7 70
+		fi
+	done
+}
+
+input_timezone() {
+	msg="Pilih zona waktu tempat :\nIni akan mengatur waktu ke zona yg dipilih."
+	msg+=" Jika tinggal di Indonesia pilih (Asia/Jakarta).\n\n"
 	
-	echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub
-	grub-mkconfig -o /boot/grub/grub.cfg
-}
-
-set_hostname() {
-	echo "$hostName" > /etc/hostname
+	menu=(
+		$(for i in $(timedatectl list-timezones); do
+			echo -e "$i \r"
+			done
+		)
+	)
 	
-	cat >> /etc/hosts <<EOF
-127.0.0.1	localhost 
-::1		localhost
-127.0.1.1	${hostName}.localdomain	$hostName 
-EOF
-}
-
-set_root_password() {
-	echo -en "$passRoot\n$passRoot" | passwd
-}
-
-set_timezone() {
-	ln -sf "/usr/share/zoneinfo/$timeZone" /etc/localtime
-	hwclock --systohc
-}
-
-set_keymap() {
-	echo "KEYMAP=$keyMap" > /etc/vconsole.conf
-}
-
-create_user() {
-	useradd -m -G wheel $userName
-	echo -en "$passUser\n$passUser" | passwd $userName
-}
-
-install_pkg_tools() {
-	seluruhPaket=($(pacman -Si $addtionalPackages | grep 'Depends On' | awk -F: '{print $2}'))
-	jumlahSeluruhPaket=${#seluruhPaket[@]}
-
-	# deklarasi array
-	pkgs=($addtionalPackages)
-
-	# menghitung elemen array
-	jumlahPaket=${#pkgs[@]}
-
-	currentTask=0 i=0
-
+	timeZone=$(whiptail --title "TIME ZONES" --menu "$msg" \
+		--nocancel --default-item "Asia/Jakarta" \
+		25 100 15 ${menu[@]} 3>&1 1>&2 2>&3
+	)
 	
-	for package in "${pkgs[@]}"; do
-		((i++)); n=0
-		
-		# daftar dependensi
-		dependensiList=($(pacman -Si $package | grep 'Depends On' | awk -F: '{print $2}'))
-		# jumlah dependensi
-		jumlahDependesi=${#dependensiList[@]}
- 
-		for dependensi in "${dependensiList[@]}"; do
-			[[ i == 0 ]] && pacman -Sy
-			# menghitung persen
-			((n++)); ((currentTask++))
+	unset menu
+}
 
-# menampilkan proses
-cat <<EOF
-XXX
-$((currentTask*100/jumlahSeluruhPaket))
-Installing [${i}/${jumlahPaket}] : ${package} 
-XXX
-EOF
-			pacman -S --needed  --noprogressbar --quite --noconfirm --asdeps $dependensi
+input_keymap() {
+	msg="Atur layout keyboard. jika bingung pilih saja: (us)\n\n"
+	menu=(
+		$(for i in $(localectl list-keymaps); do
+		echo -e "$i \r"
 		done
+		)
+	)
+	
+	keyMap=$(whiptail --title "KEYMAP" --menu "$msg" --nocancel \
+		--default-item "us" 25 100 15 ${menu[@]} 3>&1 1>&2 2>&3
+	)
+	unset menu
+}
+
+input_create_user() {
+	while true; do
+		msg="Buat user baru:"
+		userName=$(whiptail --title "CREAT USER" --inputbox "$msg" \
+			--nocancel --default-item "$userName" 7 70 3>&1 1>&2 2>&3
+		)
 		
-		pacman -S --needed --noprogressbar --quite --noconfirm --asexplicit $package
+		if [[ $? == 0 ]]; then
+			userName=$(echo $userName | tr '[:upper:]' '[:lower:]')             #convert huruf besar -> kecil
+			printf -v userName '%s' $userName; userName=$(echo "$userName")     #hapus semua spasi atau ruang putih kosong
+			
+			[[ -n $userName ]] && break
+		fi
+	done
+	
+	while :; do
 		
-	done | whiptail --title "Addtional Packages" --gauge "Please wait..." 8 80 0
+		msg="Password untuk user $userName"
+		passUser=$(whiptail --title "PASSWORD $userName"	--passwordbox "$msg" \
+			--nocancel 7 65 3>&1 1>&2 2>&3
+		)
+		
+		msg="Ulangi masukan password"
+		passUser1=$(whiptail --title "PASSWORD $userName" --passwordbox "$msg" \
+			--nocancel 7 65 3>&1 1>&2 2>&3
+		)
+		
+		if [[ -z $passUser ]] || [[ -z $passUser1 ]]; then
+			whiptail --title "PASSWORD USER" --msgbox "Password tidak boleh kosong!" 7 65
+		
+		elif [[ $passUser == $passUser1 ]]; then
+			break
+		
+		else
+			whiptail --title "PASSWORD USER" --msgbox "Password tidak sama!" 7 65
+		fi
+		
+	done
 }
 
-set_locale() {
-	echo "LANG=en_US.UTF-8" > /etc/locale.conf
-	echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
-	locale-gen
+input_pkg_tools() {
+	menu=(
+		xf86-video-intel "Driver GPU intel" off \
+		xf86-video-ati "Driver GPU Radeon" off \
+		xf86-video-nouveau "Driver GPU nouveau" off \
+		dialog "Dialog interactif di mode cli" on \
+		mtools "Utilitas untuk mengakses disk MS-DOS" on \
+		ntfs-3g "Dukungan untuk baca/tulis ke filesystem NTFS" on \
+		dosfstools "Utilitas untuk emeriksa systemfile MSDOS FAT" on \
+		os-prober "Menampilkan OS lain pada grub boot loader" on \
+		grub "Boot loader" on \
+		xorg-server "Display server" on \
+		xorg-xinit "Menjalankan aplikasi GUI" on \
+		xdg-user-dirs "Folder hirarki user" on \
+		wireless_tools "Dukungan/ekstensi untuk wireless dan jaringan    " on \
+		iwd	'alternatif network manager' off \
+		dhcpcd 'client' off \
+		networkmanager "Penyedia jaringan" on \
+		linux-lts-headers "building modules for kernel" on \
+	)
+
+	msg=$(echo -e "\nUtilitas-dasar, berfungsi mendukung kinerja system.")
+	msg+=$(echo -e "\nHati-hati ketika mengaktifkan driver GPU, pilih salah satu saja yg sesuai.")
+	msg+=$(echo -e "\nJika tidak paham, sebaiknya biarkan apa adanya.")
+	
+	addtionalPackages=$(whiptail --separate-output --title "TOOLS AND UTILITIES" \
+		--checklist "$msg" 30 80 18 "${menu[@]}" 3>&1 1>&2 2>&3
+	)
+	
+	unset menu
+	
+	if [[ $? == 0 ]]; then
+		pkgs=($addtionalPackages)
+		
+		x=0
+		packagesList=$(
+			for i in ${pkgs[@]}; do
+				((x++))
+				printf "$x.$i "
+			done
+		)
+		
+	fi
 }
-
-set_sudoers() {
-	echo "%wheel ALL=(ALL) ALL" | tee -a /etc/sudoers &>/dev/null
-}
-
-clean_packages() {
-	yes | pacman -Scc
-	rm /setup.sh
-}
-
-if [[ $1 == chroot ]]; then
-
-	install_pkg_tools
-	set_hostname
-	set_timezone
-	set_keymap
-	set_root_password
-	set_locale
-	create_user
-	set_sudoers
-	set_grub
-	clean_packages
-
-fi
