@@ -1,9 +1,10 @@
 #! /bin/env bash
+# MAIN MENU
 
-sizeRootMinimum=8 unit='GB'
-source diskmanager.sh
-source input.sh
-source setup.sh
+	sizeRootMinimum=4 unit='GB'
+	source diskmanager.sh
+	source setup.sh
+	source archbase.sh
 
 display_info() {
 	case $diskLabelType in
@@ -18,7 +19,7 @@ display_info() {
 				echo -e "\tUser Name               : $userName"
 				echo -e "\tTime Zone               : $timeZone"
 				echo -e "\tLayout Keyboard         : $keyMap\n"
-				echo -e "Optional : [${#pkgs[@]}] packages will be installed."
+				echo -e "[${#pkgs[@]}] Optional akan di install:"
 				echo "${packagesList[@]}"
 			)
 	
@@ -48,7 +49,7 @@ display_info() {
 				echo -e "\tUser Name               : $userName"
 				echo -e "\tTime Zone               : $timeZone"
 				echo -e "\tLayout Keyboard         : $keyMap\n"
-				echo -e "Optional : [${#pkgs[@]}] packages will be installed."
+				echo -e "[${#pkgs[@]}] Optional akan di install:"
 				echo "${packagesList[@]}"
 			)
 			
@@ -85,13 +86,13 @@ confirm_to_format() {
 			break 2
 		else
 			msg=$(
-				echo -e "\t!CATATAN: Setelah memilih <YA> proses install tidak dapat dibatalkan!\n"
+				echo -e "\t!PERHATIAN: Setelah memilih <YA> proses install tidak dapat dibatalkan!\n"
 				echo -e "\tProses ini akan menghapus seluruh data pada drive: ${targetInstall}."
 				echo -e "\tSebelum melanjutkan, cadangkan dulu data-data pentingnya.\n\n\n\n"
 				echo -e "\tTekan <YA> jika sudah yakin, atau <BACK> untuk kembali ke main menu."
 			)
 			
-			whiptail --clear --title "PERHATIAN!" --yesno "$msg" --yes-button "YA" \
+			whiptail --clear --title "INSTALL!" --yesno "$msg" --yes-button "YA" \
 				--no-button "BACK" 16 95 3>&1 1>&2 2>&3; GASPOL=$?
 		fi
 
@@ -166,7 +167,7 @@ main_menu() {
 		\[7\]*)
 			input_pkg_tools
 			msg="\n"; nextMenu='[8] GRUB BOOTLOADER'
-			;;
+		;;
 		
 		\[8\]*)
 			input_path_grub
@@ -178,7 +179,6 @@ main_menu() {
 		;;
 		
 		'[0] INSTALL'*)
-			
 			confirm_to_format
 			
 			if [[ $GASPOL == 0 ]]; then
@@ -197,5 +197,3 @@ done
 }
 
 main_menu
-
-
