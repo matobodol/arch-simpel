@@ -1,9 +1,6 @@
 #! /bin/env bash
 # CONFIGURE
 
-updaterepo(){
-	pacman -Sy
-	}
 
 install_base() {
 	timedate-ctl set-ntp true
@@ -103,44 +100,8 @@ create_user() {
 }
 
 install_pkg_tools() {
-	seluruhPaket=($(pacman -Si $addtionalPackages | grep 'Depends On' | awk -F: '{print $2}'))
-	jumlahSeluruhPaket=${#seluruhPaket[@]}
-
-	# deklarasi array
-	pkgs=($addtionalPackages)
-
-	# menghitung elemen array
-	jumlahPaket=${#pkgs[@]}
-
-	currentTask=0 i=0
-
-	
-	for package in "${pkgs[@]}"; do
-		((i++)); n=0
-		
-		# daftar dependensi
-		dependensiList=($(pacman -Si $package | grep 'Depends On' | awk -F: '{print $2}'))
-		# jumlah dependensi
-		jumlahDependesi=${#dependensiList[@]}
- 
-		for dependensi in "${dependensiList[@]}"; do
-			# menghitung persen
-			((n++)); ((currentTask++))
-
-# menampilkan proses
-	cat <<EOF
-XXX
-$((currentTask*100/jumlahSeluruhPaket))
-Installing [${i}/${jumlahPaket}] : ${package} 
-XXX
-EOF
-			
-			pacman -S --noconfirm --asdeps $dependensi
-		done
-		
-		pacman -S --noconfirm --asexplicit $package
-		
-	done | whiptail --title "Addtional Packages" --gauge "Please wait..." 8 80 0
+	pacman -Sy
+	pacman -S --noconfirm $addtionalPackages
 }
 
 set_locale() {
@@ -160,6 +121,7 @@ clean_packages() {
 
 if [[ $1 == chroot ]]; then
 
+	updaterepo
 	install_pkg_tools
 	set_hostname
 	set_timezone
