@@ -179,7 +179,7 @@ disk_manager() {
 							unset {sizeSwap,pathSwap,noSwap}
 							nextMenu='[1] SWAP'
 							break
-
+							
 						elif [[ $sizeSwap -gt $storageSize ]]; then
 							msg="Ups, melebihi kapasitas yg tersedia!"
 							whiptail --title "BUAT PARTISI SWAP" --msgbox "$msg" 7 75 3>&1 1>&2 2>&3
@@ -197,7 +197,7 @@ disk_manager() {
 					unset {freeSize,noRoot,noHome,noSisa}
 					unset {sizeRoot,sizeHome,sizeSisa}
 					unset {pathRoot,pathHome,pathSisa}
-
+					
 					#mendapatkan sisa kapasitas yg tersedia
 					freeSize=$((storageSize - sizeSwap))
 					
@@ -208,20 +208,20 @@ disk_manager() {
 						
 						unset {freeSize,sizeSwap,pathSwap}; break
 					fi
-
+					
 					#get user input untuk root
 					msg="Tentukan size untuk partisi root:\nKapasitas Tersedia: $freeSize $unit"
 					sizeRoot=$(whiptail --title "BUAT PARTISI ROOT" --inputbox "$msg" --nocancel 9 60 $freeSize 3>&1 1>&2 2>&3)
-
+					
 					if [[ $? == 0 ]]; then
 						
 						#blokir karaktes selain angka
 						if [[ -n $(echo $sizeRoot | grep -E [a-zA-Z.,/-]) ]]; then
 							unset sizeRoot
-
+							
 						#jika input user adalah valid
 						elif [[ $sizeRoot -ge $sizeRootMinimum ]] && [[ $sizeRoot -le $freeSize ]]; then
-
+						
 							#mendapatkan nomor partisi root
 							if [[ -n $sizeRoot ]]; then
 								
@@ -234,7 +234,7 @@ disk_manager() {
 							else
 								noRoot=1
 							fi
-
+							
 							#deklarasi dan inisialisasi hasil input user untuk ditampilkan pada main menu
 							pathRoot="${selectedDrive}${noRoot} ${sizeRoot}$unit"
 							
@@ -356,21 +356,22 @@ disk_manager() {
 							whiptail --title "BUAT PARTISI SISA" --msgbox "$msg" 7 75 3>&1 1>&2 2>&3
 							break
 						fi
-					
+						
 						#get user input untuk sisa
 						msg="Tentukan size untuk partisi sisa:\nKapasitas Tersedia: $freeSize $unit"
 						
-						sizeSisa=$(whiptail --title "BUAT PARTISI SISA" --inputbox "$msg" \
+						sizeSisa=$(
+							whiptail --title "BUAT PARTISI SISA" --inputbox "$msg" \
 							--nocancel 9 60 $freeSize 3>&1 1>&2 2>&3
 						)
-
+						
 						#blokir karakter selain angka
 						if [[ -n $(echo $sizeSisa | grep -E [a-zA-Z.,/-]) ]]; then
 							unset sizeSisa
 						
 						#jika input user adalah valid
 						elif [[ $sizeSisa -gt 0 ]] && [[ $sizeSisa -le $freeSize ]]; then
-
+						
 							#mendapatkan nomor urut partisi sisa
 							if [[ -n $noSwap ]]; then
 								noSisa=2
@@ -401,7 +402,7 @@ disk_manager() {
 								fi
 									
 							fi
-
+							
 							#deklarasi dan inisialisasi hasil input untuk ditampilkan pada main menu
 							pathSisa="${selectedDrive}$noSisa ${sizeSisa}$unit"
 							
