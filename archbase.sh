@@ -120,8 +120,6 @@ clean_packages() {
 }
 
 if [[ $1 == chroot ]]; then
-
-	updaterepo
 	install_pkg_tools
 	set_hostname
 	set_timezone
