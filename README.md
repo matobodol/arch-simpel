@@ -1,4 +1,4 @@
-# Script installer arch linux
+# Simpel script installer arch linux dengan dialog box
 
 <img src="imgmain.png" alt="main" width="400"/> <img src="imgdm.png" alt="diskmanager" width="400"/>
 <img src="imgtz.png" alt="timezone" width="400"/> <img src="imgcon.png" alt="confirm" width="400"/>
