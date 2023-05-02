@@ -186,6 +186,18 @@ main_menu() {
 				install_base
 				set_fstab
 				set_chroot
+error_message() {
+	if [[ -f /mnt/archbase.sh ]];then
+		msg='ERROR: Tidak dapat melakukan chroot ke system.'
+		msg+='\nKesalah bisa terjadi karena proses install "base" terganggu.'
+		msg+='\nPastikan koneksi internet tetap stabil.'
+		echo "$msg"
+	else
+		unmount_filesystems
+		msg='Installation is complete.'
+		echo "$msg"
+  fi
+}
 				error_message
 				break
 			fi
