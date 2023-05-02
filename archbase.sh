@@ -3,9 +3,9 @@
 
 
 install_base() {
-	timedate-ctl set-ntp true
+	timedatectl set-ntp true
 	pacman -Sy --noconfirm archlinux-keyring
-	pacstrap /mnt base base-devel linux-lts linux-firmware-lts nano libnewt
+	pacstrap /mnt base base-devel linux-lts linux-firmware nano libnewt
 	
 	# memperbaiki gpg key
 	if ! [[ $? == 0 ]]; then 
