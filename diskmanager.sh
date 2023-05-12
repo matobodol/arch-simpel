@@ -45,7 +45,8 @@ input_path_drive() {
 }
 
 input_disklabel_type() {
-	msg=$(echo -e "\n\tHARAP DI PERHATIKAN.")
+	local msg=''
+	msg+=$(echo -e "\n\tHARAP DI PERHATIKAN.")
 	msg+=$(echo -e "\n\tPada tahap ini akan memilih antara membuat partisi table atau melewatinya.")
 	msg+=$(echo -e "\n\n\tApabila memilih MBR atau GPT, step selanjutnya akan membuka menu untuk")
 	msg+=$(echo -e "\n\tmengatur alokasi size partisi: swap, root, home, dan space yg tersisa.")
