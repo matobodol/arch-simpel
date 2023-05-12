@@ -1,4 +1,4 @@
-#! /bin/env bash
+#! /bin/bash
 # INPUT DATA
 
 input_hostname() {
