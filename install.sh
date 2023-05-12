@@ -22,10 +22,10 @@ display_info() {
 				echo -e "[${#pkgs[@]}] Optional akan di install:"
 				echo "${packagesList[@]}"
 			)
-	
+			
 			whiptail --title "DISPLAY INFO" --msgbox "$msg" 22 100
 			targetInstall=$(echo "[$selectedRoot]")
-	
+			
 			msg="\n"
 			nextMenu='[0] INSTALL'
 		;;
@@ -129,9 +129,9 @@ main_menu() {
 			'[0] INSTALL' 								'' \
 			3>&1 1>&2 2>&3
 		)
-
+		
 	[[ $? == 1 ]] && exit
-
+		
 	case $mainMenu in
 		\[1\]*)
 			input_path_drive
@@ -186,18 +186,6 @@ main_menu() {
 				install_base
 				set_fstab
 				set_chroot
-error_message() {
-	if [[ -f /mnt/archbase.sh ]];then
-		msg='ERROR: Tidak dapat melakukan chroot ke system.'
-		msg+='\nKesalah bisa terjadi karena proses install "base" terganggu.'
-		msg+='\nPastikan koneksi internet tetap stabil.'
-		echo "$msg"
-	else
-		unmount_filesystems
-		msg='Installation is complete.'
-		echo "$msg"
-  fi
-}
 				error_message
 				break
 			fi
