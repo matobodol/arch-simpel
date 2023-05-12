@@ -4,7 +4,7 @@
 
 install_base() {
 	timedatectl set-ntp true
-	pacman -Sy --noconfirm archlinux-keyring
+	#pacman -Sy --noconfirm archlinux-keyring
 	pacstrap /mnt base base-devel linux-lts linux-firmware nano libnewt
 	
 	# memperbaiki gpg key
@@ -17,7 +17,7 @@ install_base() {
 		
 		pacstrap /mnt base base-devel linux-lts linux-firmware-lts nano libnewt
 		
-		if ! [[ $? == 0 ]]; then
+		if ! [[ $? -eq 0 ]]; then
 			msg='Tidak dapat menginstall system!\n Pastikan gunakan jaringan internet yang stabil'
 			whiptail --title "INSTALLING BASE" --msgbox "$msg" --ok-button 'Exit' 10 70
 			exit
@@ -30,8 +30,8 @@ set_fstab() {
 }
 
 set_chroot() {
-	SETUP_FILE="/mnt/archbase.sh"
 	cp archbase.sh /mnt
+	SETUP_FILE="/mnt/archbase.sh"
 	
 	sed -i "3ihostName='$hostName'" $SETUP_FILE
 	sed -i "4ipassRoot='$passRoot'" $SETUP_FILE
@@ -47,10 +47,28 @@ set_chroot() {
 	arch-chroot /mnt ./archbase.sh chroot
 }
 
+error_message() {
+	if [[ -f /mnt/archbase.sh ]];then
+		msg='ERROR: Tidak dapat melakukan chroot ke system.'
+		msg+='\nKesalah bisa terjadi karena proses install "base" terganggu.'
+		msg+='\nPastikan koneksi internet tetap stabil.'
+		echo "$msg"
+	else
+		pathswap=$(lsblk -o path,mountpoint | grep SWAP | awk '{print $1}')
+		[[ -n $(echo $pathswap) ]] && swapoff $pathswap
+	
+		pathmnt=$(lsblk -o path,mountpoint | grep '/mnt')
+		[[ -n $(echo $pathmnt) ]] && umount -a
+		
+		msg='Installation is complete.'
+		echo "$msg"
+  fi
+}
+
 set_grub() {
 	if [[ $grubyt -eq 0 ]]; then
 		grub-install --target=i386-pc $pathToInstallGrub
-		else
+	else
 		grub-install --target=i386-pc $selectedDrive
 	fi
 	
