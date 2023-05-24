@@ -112,6 +112,7 @@ input_create_user() {
 }
 
 input_pkg_tools() {
+	local -a menu
 	menu=(
 		xf86-video-intel "Driver GPU intel" off \
 		xf86-video-ati "Driver GPU Radeon" off \
