@@ -2,6 +2,8 @@
 # MAIN MENU
 
 real_dir=$(realpath $(dirname "$BASH_SOURCE"))
+chmod +x $real_dir/*.sh
+
 sizeRootMinimum=4 unit='GB'
 source $real_dir/diskmanager.sh
 source $real_dir/setup.sh
