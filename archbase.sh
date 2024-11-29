@@ -1,4 +1,4 @@
-#! /bin/env bash
+#!/usr/bin/env bash
 # CONFIGURE
 
 
@@ -30,7 +30,7 @@ set_fstab() {
 }
 
 set_chroot() {
-	cp archbase.sh /mnt
+	cp $(realpath "$BASH_SOURCE") /mnt
 	SETUP_FILE="/mnt/archbase.sh"
 	
 	sed -i "3ihostName='$hostName'" $SETUP_FILE
