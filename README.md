@@ -9,7 +9,8 @@ Script ini bertujuan mempermudah dalam menginstall archlinux, sayangnya hanya su
 >**Install**
 
 ```bash
-pacman -Sy && pacman -S git
+pacman -Sy
+pacman -S git
 ```
 
 ```bash
