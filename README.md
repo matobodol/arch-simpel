@@ -1,4 +1,5 @@
 # Simpel script installer arch linux dengan dialog box
+Script ini bertujuan mempermudah dalam menginstall archlinux, sayangnya hanya support untuk MBR. Dukungan untuk GPT nanti nyusul.
 
 <img src="img/imgmain.png" alt="main" width="100%"/>
 <img src="img/imgdm.png" alt="diskmanager" width="100%"/>
