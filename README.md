@@ -24,3 +24,9 @@ chmod +x *.sh
 ```bash
 ./install.sh
 ```
+
+Setelah sukses install, reboot system kemudian login dan aktifkan networkmanager dengan perintah:
+```bash
+  systemctl enable NetworkManager
+  systemctl start NetworkManager
+```
