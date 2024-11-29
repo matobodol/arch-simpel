@@ -1,10 +1,11 @@
-#! /bin/env bash
+#!/usr/bin/env bash
 # MAIN MENU
 
+real_dir=$(realpath $(dirname "$BASH_SOURCE"))
 	sizeRootMinimum=4 unit='GB'
-	source diskmanager.sh
-	source setup.sh
-	source archbase.sh
+	source $real_dir/diskmanager.sh
+	source $real_dir/setup.sh
+	source $real_dir/archbase.sh
 
 display_info() {
 	case $diskLabelType in
