@@ -124,6 +124,10 @@ clean_packages() {
     rm /archbase.sh
 }
 
+enable_network() {
+    systemctl enable NetworkManager
+}
+
 if [[ $1 == chroot ]]; then
     install_pkg_tools
     set_hostname
@@ -135,5 +139,5 @@ if [[ $1 == chroot ]]; then
     set_sudoers
     set_grub
     clean_packages
-
+    enable_network
 fi
