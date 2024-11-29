@@ -1,12 +1,12 @@
-#! /bin/env bash
+#!/usr/bin/env bash
 # DISK MANAGER
 
 reset_info_disk(){
 	unset {iswap,iroot,ihome,isisa}
-	unset {freeSize,noSwap,noRoot,noHome,noSisa}
-  unset {sizeSwap,sizeRoot,sizeHome,sizeSisa}
-  unset {pathSwap,pathRoot,pathHome,pathSisa}
-	unset {selectedRoot,selectedRootSize,rootSize}
+ 	unset {freeSize,noSwap,noRoot,noHome,noSisa}
+  	unset {sizeSwap,sizeRoot,sizeHome,sizeSisa}
+   	unset {pathSwap,pathRoot,pathHome,pathSisa}
+    	unset {selectedRoot,selectedRootSize,rootSize}
 }
 
 storage_list(){
